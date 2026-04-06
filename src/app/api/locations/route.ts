@@ -16,7 +16,7 @@ export async function GET() {
         captured_at,
         created_at
       FROM sky_views
-      ORDER BY COALESCE(captured_at, created_at) DESC
+      ORDER BY captured_at DESC NULLS LAST, created_at DESC
       LIMIT 200;
     `;
 

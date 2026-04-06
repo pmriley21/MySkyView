@@ -53,6 +53,12 @@ export async function ensureSchema() {
           created_at timestamptz NOT NULL DEFAULT now()
         );
       `;
+
+      await sql`ALTER TABLE sky_views ADD COLUMN IF NOT EXISTS captured_at timestamptz;`;
+      await sql`
+        ALTER TABLE sky_views
+        ADD COLUMN IF NOT EXISTS created_at timestamptz NOT NULL DEFAULT now();
+      `;
     })();
   }
 

@@ -119,8 +119,19 @@ export async function POST(request: Request) {
 
     const capturedAt =
       toValidDate(metadata?.DateTimeOriginal) ??
+      toValidDate(metadata?.DateTimeDigitized) ??
       toValidDate(metadata?.CreateDate) ??
       toValidDate(metadata?.ModifyDate);
+
+    if (!capturedAt) {
+      return NextResponse.json(
+        {
+          error:
+            "No image date/time metadata found. Please upload a photo that includes EXIF capture date and time.",
+        },
+        { status: 400 }
+      );
+    }
 
     const processedBuffer = await sharp(originalBuffer)
       .rotate()

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Map, { LocationItem } from "./Map";
+import ActivityChart from "./ActivityChart";
 
 function formatDate(value: string | null) {
   if (!value) {
@@ -96,13 +97,15 @@ export default function LocationsSection() {
                 />
                 <div>
                   <strong>{location.title}</strong>
-                  <span>{formatDate(location.captured_at ?? location.created_at)}</span>
+                  <span>{formatDate(location.captured_at)}</span>
                 </div>
               </li>
             ))}
           </ul>
         </aside>
       </div>
+
+      <ActivityChart locations={locations} />
     </section>
   );
 }

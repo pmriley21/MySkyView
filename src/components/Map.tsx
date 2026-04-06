@@ -94,7 +94,7 @@ export default function Map({ locations }: MapProps) {
 
           const safeTitle = escapeHtml(location.title);
           const safeUrl = escapeHtml(location.image_url);
-          const takenOn = escapeHtml(formatDate(location.captured_at ?? location.created_at));
+          const takenOn = escapeHtml(formatDate(location.captured_at));
 
           const info = new google.maps.InfoWindow({
             content: `<div style="max-width:220px"><img src="${safeUrl}" alt="${safeTitle}" style="width:100%;border-radius:8px;margin-bottom:8px" /><strong style="display:block;margin-bottom:4px">${safeTitle}</strong><span style="color:#405a72;font-size:12px">${takenOn}</span></div>`,

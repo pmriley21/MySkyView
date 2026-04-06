@@ -244,6 +244,96 @@ select {
   padding: 22px;
 }
 
+.activity-card {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.96), rgba(240, 248, 255, 0.94));
+  border: 1px solid rgba(11, 54, 94, 0.1);
+  border-radius: 20px;
+  box-shadow: var(--panel-shadow);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.activity-header {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.activity-header h3 {
+  font-family: var(--font-display);
+  color: var(--sky-deep);
+}
+
+.activity-range {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.range-pill {
+  border-radius: 999px;
+  border: 1px solid rgba(12, 58, 101, 0.24);
+  background: #fff;
+  color: var(--sky-deep);
+  font-size: 0.82rem;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.range-pill--active {
+  background: var(--sky-deep);
+  color: #fff;
+  border-color: var(--sky-deep);
+}
+
+.activity-graph {
+  height: 210px;
+  border: 1px solid rgba(12, 58, 101, 0.1);
+  background: linear-gradient(180deg, #f8fcff, #edf6ff);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.activity-bar-wrap {
+  min-width: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.activity-bar-track {
+  height: 150px;
+  width: 100%;
+  border-radius: 10px;
+  background: rgba(47, 109, 165, 0.12);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.activity-bar {
+  width: 100%;
+  border-radius: 10px;
+  background: linear-gradient(180deg, var(--sky-accent), var(--sky-mid));
+}
+
+.activity-label {
+  font-size: 0.68rem;
+  color: var(--muted);
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
 .form-grid {
   display: grid;
   gap: 14px;
@@ -297,6 +387,12 @@ select {
   text-align: center;
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.footer-link {
+  color: var(--sky-deep);
+  font-weight: 600;
+  text-decoration: underline;
 }
 
 @media (max-width: 920px) {

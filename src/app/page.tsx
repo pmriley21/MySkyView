@@ -45,7 +45,17 @@ export default function Home() {
       </section>
 
       <footer className="footer">
-        <p>MySkyView - personal sky tracking with EXIF GPS map pins</p>
+        <p>
+          MySkyView - personal sky tracking with EXIF GPS map pins -{" "}
+          <a
+            className="footer-link"
+            href="https://github.com/pmriley21"
+            target="_blank"
+            rel="noreferrer"
+          >
+            github.com/pmriley21
+          </a>
+        </p>
       </footer>
     </div>
   );

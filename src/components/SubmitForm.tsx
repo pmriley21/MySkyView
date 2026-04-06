@@ -82,7 +82,7 @@ export default function SubmitForm() {
             required
           />
           <p className="form-help">
-            Keep location metadata enabled on your phone camera. Max upload size: 25 MB.
+            Keep location + date/time metadata enabled on your camera. Max upload size: 25 MB.
           </p>
         </label>
       </div>
@@ -92,7 +92,7 @@ export default function SubmitForm() {
           {status === "loading" ? "Uploading..." : "Upload sky view"}
         </button>
         <p className={`form-message form-message--${status === "error" ? "error" : "success"}`}>
-          {message || "We resize to 800px wide and remove temporary originals."}
+          {message || "Requires EXIF GPS + capture date/time. Image is resized to 800px wide."}
         </p>
       </div>
     </form>
