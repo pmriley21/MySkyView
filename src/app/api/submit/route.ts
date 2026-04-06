@@ -1,5 +1,4 @@
-import { mkdir, unlink, writeFile } from "node:fs/promises";
-import path from "node:path";
+import { del, put } from "@vercel/blob";
 import * as exifr from "exifr";
 import sharp from "sharp";
 import { NextResponse } from "next/server";
@@ -41,21 +40,20 @@ function toValidDate(value: unknown) {
   return null;
 }
 
-async function safeUnlink(filePath: string | null) {
-  if (!filePath) {
+async function safeDeleteBlob(blobUrl: string | null) {
+  if (!blobUrl) {
     return;
   }
 
   try {
-    await unlink(filePath);
+    await del(blobUrl);
   } catch {
-    // Best effort cleanup.
+    // Best effort cleanup when DB insert fails after blob upload.
   }
 }
 
 export async function POST(request: Request) {
-  let tempOriginalPath: string | null = null;
-  let processedImagePath: string | null = null;
+  let uploadedBlobUrl: string | null = null;
 
   try {
     const formData = await request.formData();
@@ -93,21 +91,6 @@ export async function POST(request: Request) {
     const submissionId = crypto.randomUUID();
     const originalBuffer = Buffer.from(await image.arrayBuffer());
 
-    const rootPath = process.cwd();
-    const originalsDir = path.join(rootPath, "storage", "originals");
-    const webDir = path.join(rootPath, "public", "uploads", "sky");
-    await mkdir(originalsDir, { recursive: true });
-    await mkdir(webDir, { recursive: true });
-
-    const originalExtension = path.extname(image.name || "").toLowerCase() || ".img";
-    const tempOriginalName = `${submissionId}-orig${originalExtension}`;
-    const processedFileName = `${submissionId}.webp`;
-
-    tempOriginalPath = path.join(originalsDir, tempOriginalName);
-    processedImagePath = path.join(webDir, processedFileName);
-
-    await writeFile(tempOriginalPath, originalBuffer);
-
     const metadata = await exifr.parse(originalBuffer, {
       gps: true,
       tiff: true,
@@ -139,13 +122,30 @@ export async function POST(request: Request) {
       toValidDate(metadata?.CreateDate) ??
       toValidDate(metadata?.ModifyDate);
 
-    await sharp(tempOriginalPath)
+    const processedBuffer = await sharp(originalBuffer)
       .rotate()
       .resize({ width: 800, withoutEnlargement: true, fit: "inside" })
       .webp({ quality: 82 })
-      .toFile(processedImagePath);
+      .toBuffer();
 
-    const publicImagePath = `/uploads/sky/${processedFileName}`;
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return NextResponse.json(
+        {
+          error:
+            "Storage is not configured. Set BLOB_READ_WRITE_TOKEN in Vercel project environment variables.",
+        },
+        { status: 500 }
+      );
+    }
+
+    const blobPath = `uploads/sky/${submissionId}.webp`;
+    const blob = await put(blobPath, processedBuffer, {
+      access: "public",
+      addRandomSuffix: false,
+      contentType: "image/webp",
+    });
+    uploadedBlobUrl = blob.url;
+
     const sql = getSql();
 
     await sql`
@@ -160,22 +160,20 @@ export async function POST(request: Request) {
       VALUES (
         ${submissionId},
         ${parsedTitle.data},
-        ${publicImagePath},
+        ${uploadedBlobUrl},
         ${latitude},
         ${longitude},
         ${capturedAt}
       );
     `;
 
-    return NextResponse.json({ ok: true, id: submissionId, imageUrl: publicImagePath });
+    return NextResponse.json({ ok: true, id: submissionId, imageUrl: uploadedBlobUrl });
   } catch (error) {
     console.error("Upload failed", error);
-    await safeUnlink(processedImagePath);
+    await safeDeleteBlob(uploadedBlobUrl);
     return NextResponse.json(
       { error: "Unable to process this image right now." },
       { status: 500 }
     );
-  } finally {
-    await safeUnlink(tempOriginalPath);
   }
 }
